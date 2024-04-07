@@ -109,3 +109,5 @@ def getAllProductsMasEspecifico():
         return f'Error conexión {e}'    
     finally:
         conn.close()
+
+        

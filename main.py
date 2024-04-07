@@ -1,8 +1,8 @@
 from typing import Union
-from fastapi import FastAPI
 from model import Product
-from db import clientPS
-from db import productDB
+from db import productDB, csv
+from fastapi import File, UploadFile, FastAPI
+import pandas as pd
 
 app = FastAPI()
 
@@ -35,3 +35,22 @@ def updateProductById(prod: Product.Product):
 @app.delete("/product/{id}")
 def deleteProductByID(id):
     return productDB.deleteProductByID(id);
+
+@app.post("/loadProducts")
+async def loadProductes(file: UploadFile):
+    datosFichero = pd.read_csv(file.file, header=0)
+    for i, row in datosFichero.iterrows():
+        j = row.to_dict()
+        category(j["id_categoria"], j["nom_categoria"])
+        subcategory(j["id_categoria"], j["id_subcategoria"], j["nom_subcategoria"])
+        product(j["id_producto"], j["nom_producto"], j["descripcion_producto"], j["companyia"], j["precio"],j["unidades"], j["id_subcategoria"])
+    return {"message": "introducidos los datos de forma correcta"}
+
+def category(id, name):
+    return csv.category(id, name)
+
+def subcategory(idCAt, id, name):
+    return csv.subcategory(idCAt, id, name)
+
+def product(id, name, desc, company, price, unit, idSubcate):
+    return csv.product(id, name, desc, company, price, unit, idSubcate)
